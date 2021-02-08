@@ -56,6 +56,7 @@ public class Encryptor extends javax.swing.JFrame {
     private void initComponents() {
 
         btnEncrypt = new javax.swing.JButton();
+        btnDecrypt = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -66,6 +67,13 @@ public class Encryptor extends javax.swing.JFrame {
             }
         });
 
+        btnDecrypt.setText("Decrypt File ...");
+        btnDecrypt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDecryptActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -73,13 +81,17 @@ public class Encryptor extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnEncrypt)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnDecrypt)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnEncrypt)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnEncrypt)
+                    .addComponent(btnDecrypt))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -128,6 +140,49 @@ public class Encryptor extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnEncryptActionPerformed
+
+    private void btnDecryptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDecryptActionPerformed
+        int returnValue = fc.showOpenDialog(this);
+        
+        if(returnValue == JFileChooser.APPROVE_OPTION){
+            try{
+                File[] inputFiles = fc.getSelectedFiles();
+                
+                for(File file : inputFiles){ 
+                    String inputPath = file.getPath();
+                    String[] arrayOfPath = inputPath.split("\\\\");
+
+                    String newPath = inputPath
+                            .replace(arrayOfPath[arrayOfPath.length - 1],"decrypted\\" 
+                                    + arrayOfPath[arrayOfPath.length - 1]);
+                   
+                    String password = "1qaz2wsx";
+                    String salt = "12345678";
+                    IvParameterSpec ivParameterSpec = generateIv();
+                    SecretKey key = getKeyFromPassword(password,salt);
+                    String algorithm = "AES/CBC/PKCS5Padding";
+                    File encryptedFile = new File(newPath);
+                    decryptFile(algorithm, key, ivParameterSpec, file, encryptedFile);
+                }
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeySpecException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidAlgorithmParameterException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(Encryptor.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_btnDecryptActionPerformed
 
     
     private static void encryptFile(String algorithm, SecretKey key, IvParameterSpec iv,
@@ -237,6 +292,7 @@ public class Encryptor extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDecrypt;
     private javax.swing.JButton btnEncrypt;
     // End of variables declaration//GEN-END:variables
 }
